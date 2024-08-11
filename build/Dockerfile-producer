@@ -1,10 +1,10 @@
 # Stage 1: Build the Go binary
-FROM golang:1.20-alpine AS builder
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
 
-# Copy go.mod file
-COPY go.mod ./
+# Copy go.mod and go.sum files
+COPY go.mod go.sum ./
 
 # Download dependencies
 RUN go mod download
@@ -13,7 +13,6 @@ RUN go mod download
 COPY . .
 
 # Build the binary
-RUN ls -l ./cmd/producer/ 
 RUN go build -o producer ./cmd/producer/main.go
 
 # Stage 2: Run the Go binary
@@ -23,6 +22,9 @@ WORKDIR /root/
 
 # Copy the built binary from the builder stage
 COPY --from=builder /app/producer .
+
+# Copy the config file to the proper location
+COPY --from=builder /app/configs/producer/config.yaml ./configs/producer/config.yaml
 
 # Run the producer binary
 CMD ["./producer"]
