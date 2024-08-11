@@ -8,10 +8,12 @@ log-tracer/
 │       └── main.go
 ├── internal/
 │   ├── config/
-│   │   ├── config.go
+│   │   └── config.go
 │   ├── producer/
 │   │   ├── handler.go
-│   │   └── kafka_producer.go
+│   │   ├── kafka_producer.go
+│   │   ├── partitioner.go
+│   │   ├── serializer.go
 │   ├── consumer/
 │   │   ├── handler.go
 │   │   └── kafka_consumer.go
@@ -22,7 +24,7 @@ log-tracer/
 │   │       └── index.html
 │   └── pkg/
 │       ├── kafka/
-│       │   ├── kafka.go
+│       │   └── kafka.go
 │       └── logger/
 │           └── logger.go
 ├── api/
@@ -42,7 +44,6 @@ log-tracer/
 │   ├── Dockerfile-consumer
 │   └── Dockerfile-dashboard
 ├── docker-compose.yml
-├── go.mod
 ├── Makefile
 └── README.md
 
