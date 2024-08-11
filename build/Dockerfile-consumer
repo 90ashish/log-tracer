@@ -1,15 +1,15 @@
 # Stage 1: Build the Go binary
-FROM golang:1.20-alpine AS builder
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
 
-# Copy go.mod and go.sum files
+# Copy go.mod and go.sum
 COPY go.mod go.sum ./
 
 # Download dependencies
 RUN go mod download
 
-# Copy the source code
+# Copy the entire project into the Docker container
 COPY . .
 
 # Build the binary
@@ -22,6 +22,9 @@ WORKDIR /root/
 
 # Copy the built binary from the builder stage
 COPY --from=builder /app/consumer .
+
+# Copy the consumer config file
+COPY --from=builder /app/configs/consumer/config.yaml ./configs/consumer/config.yaml
 
 # Run the consumer binary
 CMD ["./consumer"]

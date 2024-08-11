@@ -12,12 +12,12 @@ func main() {
 	fmt.Println("Producer service started")
 
 	// Load configuration
-	cfg, err := config.LoadConfig("configs/producer/config.yaml")
+	cfg, err := config.LoadProducerConfig("configs/producer/config.yaml")
 	if err != nil {
 		logger.Error("Failed to load config", err)
 		return
 	}
-	fmt.Printf("Loaded Kafka Config: %+v\n", cfg.Kafka)
+	fmt.Printf("Loaded Kafka Config: %+v\n", cfg.KafkaProducerConfig)
 
 	// Initialize Kafka producer
 	kafkaProducer, err := producer.NewKafkaProducer(cfg)

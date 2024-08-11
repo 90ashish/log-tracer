@@ -56,7 +56,8 @@ services:
     networks:
       - kafka-net
     depends_on:
-      - kafka
+      kafka:
+         condition: service_healthy
 
   dashboard:
     build:
