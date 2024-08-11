@@ -1,0 +1,14 @@
+Explanation:
+
+    Zookeeper: Manages and coordinates the Kafka broker.
+    Kafka: Acts as the central message broker for the logs.
+    Producer: Will produce logs to Kafka. The Docker image for this service will be built from the producer/ directory.
+    Consumer: Will consume logs from Kafka and process them. The Docker image for this service will be built from the consumer/ directory.
+    Dashboard: Will provide a real-time display of logs. The Docker image for this service will be built from the dashboard/ directory.
+    Networks: All services are connected to the same network (kafka-net) for internal communication.
+
+Directory Structure
+
+    producer/: Contains the log producer service.
+    consumer/: Contains the log consumer service.
+    dashboard/: Contains the web dashboard for displaying logs.
