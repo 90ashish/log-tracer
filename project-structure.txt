@@ -42,6 +42,7 @@ log-tracer/
 │   ├── Dockerfile-consumer
 │   └── Dockerfile-dashboard
 ├── docker-compose.yml
+├── go.mod
 ├── Makefile
 └── README.md
 

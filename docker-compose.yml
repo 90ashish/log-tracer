@@ -28,8 +28,8 @@ services:
 
   producer:
     build:
-      context: ./producer
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: build/Dockerfile-producer
     container_name: log-producer
     environment:
       KAFKA_BROKER: kafka:9092
@@ -40,8 +40,8 @@ services:
 
   consumer:
     build:
-      context: ./consumer
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: build/Dockerfile-consumer
     container_name: log-consumer
     environment:
       KAFKA_BROKER: kafka:9092
@@ -53,8 +53,8 @@ services:
 
   dashboard:
     build:
-      context: ./dashboard
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: build/Dockerfile-dashboard
     container_name: log-dashboard
     ports:
       - "8080:8080"
