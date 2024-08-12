@@ -3,17 +3,44 @@ focusing on the key components: data collection, processing, storage, and visual
 Here's a step-by-step plan to build the system:
 Phase 1: Data Collection (Producers)
 
-    Enhanced Logging in Producers:
-        Add contextual information (e.g., service name, environment, severity level) to each log message.
-        Implement structured logging (e.g., JSON format) to make logs easier to parse and analyze.
+    1. Enhanced Logging in Producers
 
-    Support for Multiple Log Sources:
-        Enable producers to collect logs from multiple sources or services.
-        Implement configuration to dynamically add or remove log sources without downtime.
+    Contextual Information in Logs:
+        Service Name: Each log message should include the name of the service generating the log.
+        Environment: Include environment information (e.g., development, staging, production).
+        Severity Level: Add severity levels such as INFO, WARN, ERROR, and DEBUG.
 
-    Implementing Secure Log Transmission:
-        Add SSL/TLS support to ensure secure transmission of log data to Kafka.
-        Implement authentication and authorization mechanisms for producers.
+    Structured Logging (JSON Format):
+        Use a structured logging format like JSON for all log messages. This makes logs easier to 
+        parse and analyze in downstream systems.
+        Update the serializer.go file to ensure that all log messages are serialized into a structured 
+        JSON format with the added contextual fields.
+
+    Implementation Steps:
+        Update the log handling logic in the handler.go file within the producer directory to include the 
+        additional contextual information.
+        Modify the SerializeToJson function to format the logs as structured JSON, including the new fields.
+        Ensure that the logging mechanism can easily add or remove contextual fields by making the serializer 
+        function flexible.
+
+2. Support for Multiple Log Sources
+
+    Dynamic Configuration of Log Sources:
+        Modify the config.yaml file to support multiple log sources. This can be done by allowing the sources 
+        key to accept a list of services or log sources.
+        For each log source, specify details such as the source name, severity level, and any other relevant information.
+
+    Implementation of Dynamic Log Source Handling:
+        Update the config.go file to parse the new configuration structure that includes multiple sources.
+        Modify the kafka_producer.go and handler.go files to dynamically handle logs from different sources.
+        Implement a mechanism to reload the configuration at runtime without requiring a restart, allowing 
+        the addition or removal of log sources dynamically.
+
+    Implementation Steps:
+        Update the config.go file to handle an array of log sources.
+        Adjust the log sending logic in handler.go to loop through all configured log sources and send logs accordingly.
+        Implement a configuration reloader that watches the config.yaml file for changes and updates the 
+        running configuration dynamically.
 
 Phase 2: Data Processing (Consumers)
 
