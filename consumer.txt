@@ -3,7 +3,8 @@ To build a robust and scalable Kafka consumer for your project, you should consi
 1. Connection to Kafka Cluster:
 
     Kafka Broker Configuration: Establish a connection to Kafka brokers using appropriate settings.
-    Consumer Group: Use consumer groups to allow multiple consumers to work together, ensuring each message is processed by one consumer.
+    Consumer Group: Use consumer groups to allow multiple consumers to work together, ensuring each message is 
+    processed by one consumer.
 
 2. Message Deserialization:
 
@@ -12,8 +13,10 @@ To build a robust and scalable Kafka consumer for your project, you should consi
 
 3. Message Processing:
 
-    Business Logic: Implement the core business logic for processing consumed messages. This could involve writing to a database, triggering other services, etc.
-    Idempotency: Ensure that message processing is idempotent, meaning processing the same message multiple times will have the same effect as processing it once.
+    Business Logic: Implement the core business logic for processing consumed messages. This could involve writing to a 
+    database, triggering other services, etc.
+    Idempotency: Ensure that message processing is idempotent, meaning processing the same message multiple times 
+    will have the same effect as processing it once.
 
 4. Error Handling and Retries:
 
@@ -45,12 +48,14 @@ To build a robust and scalable Kafka consumer for your project, you should consi
 
 10. Configuration Management:
 
-    Configurable Settings: Make Kafka consumer settings configurable through a configuration file or environment variables to allow for easy adjustments.
+    Configurable Settings: Make Kafka consumer settings configurable through a configuration file or environment 
+    variables to allow for easy adjustments.
 
 Implementation Steps:
 
     Set up Consumer Configurations: Create a configuration file for the consumer similar to the producer.
-    Implement Consumer Logic: Create a consumer that connects to Kafka, deserializes messages, processes them, and handles errors.
+    Implement Consumer Logic: Create a consumer that connects to Kafka, deserializes messages, processes them, 
+    and handles errors.
     Handle Message Persistence: Decide where processed messages or their results should be stored or passed along in your system.
     Testing: Test the consumer with different types of messages and under varying loads.
     Integration with Producer: Ensure that the consumer works seamlessly with the producer and other parts of your system.
@@ -60,37 +65,49 @@ To build a robust and scalable Kafka consumer, we can break down the process int
 
 1. Connection to Kafka Cluster:
 
-    Kafka Broker Configuration: Establish a connection to one or more Kafka brokers using appropriate configuration settings (e.g., bootstrap.servers).
-    Consumer Group: Set up the consumer as part of a consumer group for load balancing and fault tolerance. Each consumer in the group will process different partitions of the topic.
-    Consumer Configuration: Set up properties such as auto.offset.reset, enable.auto.commit, session.timeout.ms, and max.poll.records.
+    Kafka Broker Configuration: Establish a connection to one or more Kafka brokers using appropriate configuration 
+    settings (e.g., bootstrap.servers).
+    Consumer Group: Set up the consumer as part of a consumer group for load balancing and fault tolerance. Each 
+    consumer in the group will process different partitions of the topic.
+    Consumer Configuration: Set up properties such as auto.offset.reset, enable.auto.commit, session.timeout.ms, 
+    and max.poll.records.
 
 2. Message Deserialization:
 
-    Deserialization of Data: Implement deserialization of messages (e.g., JSON, Avro, Protobuf) after consuming them from Kafka. Use deserializers provided by Kafka or implement custom deserializers.
+    Deserialization of Data: Implement deserialization of messages (e.g., JSON, Avro, Protobuf) after consuming 
+    them from Kafka. Use deserializers provided by Kafka or implement custom deserializers.
 
 3. Message Processing:
 
-    Processing Logic: Implement the logic to handle the consumed messages. This could include filtering, transforming, and storing the data.
+    Processing Logic: Implement the logic to handle the consumed messages. This could include filtering, 
+    transforming, and storing the data.
     Error Handling: Implement mechanisms for handling and logging errors during message processing.
     Idempotence: Ensure that the consumer processing logic is idempotent to handle potential duplicate messages.
 
 4. Offsets Management:
 
-    Manual Offset Management: Consider managing offsets manually for more control, especially if you want to commit offsets after successful message processing.
-    Auto Commit: Alternatively, you can use Kafka’s auto-commit feature for offsets, but be aware of the risks of committing offsets before processing completes.
+    Manual Offset Management: Consider managing offsets manually for more control, especially if you want to commit 
+    offsets after successful message processing.
+    Auto Commit: Alternatively, you can use Kafka’s auto-commit feature for offsets, but be aware of the risks of 
+    committing offsets before processing completes.
 
 5. Scalability and Performance:
 
-    Parallel Processing: Implement parallel processing of messages to improve throughput, ensuring that each partition is processed independently.
+    Parallel Processing: Implement parallel processing of messages to improve throughput, ensuring that each partition 
+    is processed independently.
     Load Balancing: Utilize consumer groups effectively to distribute the workload across multiple consumers.
-    Backpressure Handling: Implement backpressure handling to prevent the consumer from being overwhelmed by a high volume of messages.
+    Backpressure Handling: Implement backpressure handling to prevent the consumer from being overwhelmed by a high
+    volume of messages.
 
 6. Resilience and Monitoring:
 
-    Retry Logic: Implement retry mechanisms for transient failures, such as network issues or temporary unavailability of downstream services.
+    Retry Logic: Implement retry mechanisms for transient failures, such as network issues or temporary unavailability 
+    of downstream services.
     Circuit Breaker: Consider implementing a circuit breaker pattern to handle repeated failures gracefully.
-    Logging and Metrics: Implement logging for monitoring and debugging, and expose metrics for monitoring consumer performance and health.
-    Graceful Shutdown: Ensure the consumer can shut down gracefully, allowing in-flight messages to be processed and offsets to be committed.
+    Logging and Metrics: Implement logging for monitoring and debugging, and expose metrics for monitoring consumer 
+    performance and health.
+    Graceful Shutdown: Ensure the consumer can shut down gracefully, allowing in-flight messages to be processed 
+    and offsets to be committed.
 
 7. Security:
 
