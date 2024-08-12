@@ -26,5 +26,5 @@ COPY --from=builder /app/producer .
 # Copy the config file to the proper location
 COPY --from=builder /app/configs/producer/config.yaml ./configs/producer/config.yaml
 
-# Run the producer binary
+# Run the producer binary with config watching (if applicable)
 CMD ["./producer"]

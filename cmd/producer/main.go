@@ -3,16 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"log-tracer/internal/config"
+	"log-tracer/internal/pkg/config_watcher"
 	"log-tracer/internal/pkg/logger"
 	"log-tracer/internal/producer"
+	"sync"
+	"time"
 )
 
 func main() {
 	fmt.Println("Producer service started")
 
-	// Load configuration
-	cfg, err := config.LoadProducerConfig("configs/producer/config.yaml")
+	// Load initial configuration
+	configPath := "configs/producer/config.yaml"
+	cfg, err := config.LoadProducerConfig(configPath)
 	if err != nil {
 		logger.Error("Failed to load config", err)
 		return
@@ -30,13 +35,34 @@ func main() {
 
 	// Initialize LogHandler
 	logHandler := producer.NewLogHandler(kafkaProducer)
+	var mu sync.Mutex // Mutex to protect configuration reloads
 
-	// Test sending a log message
-	err = logHandler.HandleLogMessage(context.Background(), "test_key", "test_message")
-	if err != nil {
-		logger.Error("Failed to handle log message", err)
-		return
+	// Define reload function to update log sources dynamically
+	reloadFunc := func(newConfig *config.ProducerConfig) {
+		mu.Lock()
+		defer mu.Unlock()
+		fmt.Println("Reloading configuration...")
+		logHandler.UpdateConfig(newConfig)
+		fmt.Printf("New Kafka Config: %+v\n", newConfig.KafkaProducerConfig)
 	}
 
-	fmt.Println("Log message sent successfully")
+	// Start watching the configuration file for changes
+	configWatcher := config_watcher.NewConfigWatcher(configPath, reloadFunc)
+	go func() {
+		if err := configWatcher.WatchConfig(); err != nil {
+			log.Fatalf("Failed to watch config file: %v", err)
+		}
+	}()
+
+	// Simulate log messages being sent
+	for {
+		err = logHandler.HandleLogMessage(context.Background(), "test_key", "test_message")
+		if err != nil {
+			logger.Error("Failed to handle log message", err)
+			return
+		}
+		fmt.Println("Log message sent successfully")
+		// Sleep or wait to simulate ongoing logging
+		time.Sleep(5 * time.Second)
+	}
 }

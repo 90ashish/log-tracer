@@ -44,6 +44,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+    volumes:
+      - ./configs/producer:/root/configs/producer # Mount the config directory
 
   consumer:
     build:
@@ -58,6 +60,8 @@ services:
     depends_on:
       kafka:
          condition: service_healthy
+    volumes:
+      - ./configs/consumer:/root/configs/consumer # Mount the config directory
 
   dashboard:
     build:
