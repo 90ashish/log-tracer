@@ -7,3 +7,16 @@ kafka_producer:
   batch_size: 16384
   linger_ms: 1
   compression_type: "gzip"
+  sources:
+    - name: "serviceA"
+      environment: "production"
+      severity_level: "INFO"
+    - name: "serviceB"
+      environment: "staging"
+      severity_level: "WARN"
+    - name: "serviceC"
+      environment: "development"
+      severity_level: "DEBUG"
+    - name: "serviceD"
+      environment: "production"
+      severity_level: "ERROR"

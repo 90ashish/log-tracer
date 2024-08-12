@@ -7,15 +7,23 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// LogSourceConfig defines the structure for each log source
+type LogSourceConfig struct {
+	Name          string `yaml:"name"`
+	Environment   string `yaml:"environment"`
+	SeverityLevel string `yaml:"severity_level"`
+}
+
 // KafkaProducerConfig holds the Kafka configuration parameters for the producer
 type KafkaProducerConfig struct {
-	Brokers         []string `yaml:"brokers"`
-	Topic           string   `yaml:"topic"`
-	Acks            int      `yaml:"acks"`
-	Retries         int      `yaml:"retries"`
-	BatchSize       int      `yaml:"batch_size"`
-	LingerMS        int      `yaml:"linger_ms"`
-	CompressionType string   `yaml:"compression_type"`
+	Brokers         []string          `yaml:"brokers"`
+	Topic           string            `yaml:"topic"`
+	Acks            int               `yaml:"acks"`
+	Retries         int               `yaml:"retries"`
+	BatchSize       int               `yaml:"batch_size"`
+	LingerMS        int               `yaml:"linger_ms"`
+	CompressionType string            `yaml:"compression_type"`
+	Sources         []LogSourceConfig `yaml:"sources"` // Added for multiple log sources
 }
 
 // KafkaConsumerConfig holds the Kafka configuration parameters for the consumer

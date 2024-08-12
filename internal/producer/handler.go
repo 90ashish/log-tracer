@@ -3,6 +3,7 @@ package producer
 import (
 	"context"
 	"log-tracer/internal/pkg/logger"
+	"time"
 )
 
 // LogHandler manages the creation and sending of log messages to Kafka
@@ -17,22 +18,33 @@ func NewLogHandler(producer *KafkaProducer) *LogHandler {
 	}
 }
 
-// HandleLogMessage creates and sends a log message to Kafka
+// HandleLogMessage creates and sends log messages to Kafka for each source
 func (h *LogHandler) HandleLogMessage(ctx context.Context, key string, logMessage interface{}) error {
-	// Serialize the log message to JSON
-	serializedMessage, err := SerializeToJson(logMessage)
-	if err != nil {
-		logger.Error("Failed to serialize log message", err)
-		return err
-	}
+	for _, source := range h.Producer.Config.KafkaProducerConfig.Sources {
+		// Add contextual information to the log message
+		contextualLogMessage := map[string]interface{}{
+			"timestamp":      time.Now().Format(time.RFC3339),
+			"service_name":   source.Name,
+			"environment":    source.Environment,
+			"severity_level": source.SeverityLevel,
+			"message":        logMessage,
+		}
 
-	// Send the serialized log message to Kafka
-	err = h.Producer.SendMessage(ctx, []byte(key), serializedMessage)
-	if err != nil {
-		logger.Error("Failed to send log message", err)
-		return err
-	}
+		// Serialize the log message to JSON
+		serializedMessage, err := SerializeToJson(contextualLogMessage)
+		if err != nil {
+			logger.Error("Failed to serialize log message", err)
+			return err
+		}
 
-	logger.Info("Log message handled successfully")
+		// Send the serialized log message to Kafka
+		err = h.Producer.SendMessage(ctx, []byte(key), serializedMessage)
+		if err != nil {
+			logger.Error("Failed to send log message", err)
+			return err
+		}
+
+		logger.Info("Log message handled successfully", "service_name", source.Name)
+	}
 	return nil
 }
