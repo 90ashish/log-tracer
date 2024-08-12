@@ -1,7 +1,10 @@
 Project: Real-Time Log Monitoring System
 Description:
 
-Build a system that collects, processes, and displays real-time logs from different services or applications. Kafka will be used to stream log data between producers (applications generating logs) and consumers (services that process or visualize logs).
+Build a system that collects, processes, and displays real-time logs from different services or applications. 
+Kafka will be used to stream log data between producers (applications generating logs) and consumers 
+(services that process or visualize logs).
+
 Components:
 
     Log Producer Service:
@@ -9,17 +12,21 @@ Components:
         The service sends log messages to a Kafka topic.
 
     Kafka Broker:
-        Kafka will act as the central message broker. Set up a Kafka cluster (can be a single node for simplicity) to manage log data streams.
+        Kafka will act as the central message broker. Set up a Kafka cluster (can be a single node for simplicity) to 
+        manage log data streams.
 
     Log Processing Service:
-        A Go service that consumes logs from the Kafka topic, processes them (e.g., filtering, aggregation), and potentially sends alerts if certain conditions are met (e.g., error rate threshold).
+        A Go service that consumes logs from the Kafka topic, processes them (e.g., filtering, aggregation), and 
+        potentially sends alerts if certain conditions are met (e.g., error rate threshold).
 
     Real-Time Dashboard:
-        This could be a simple web interface to display logs in real-time. You could use WebSockets in Go to push log data to the frontend.
+        This could be a simple web interface to display logs in real-time. You could use WebSockets in Go to push log data 
+        to the frontend.
         Alternatively, send processed data to another Kafka topic and have a Go service consume it to feed the dashboard.
 
     Alerting Service (Optional):
-        A simple service that consumes logs from Kafka and sends alerts (e.g., via email or a messaging app) based on certain criteria, such as error logs or high latency.
+        A simple service that consumes logs from Kafka and sends alerts (e.g., via email or a messaging app) based on 
+        certain criteria, such as error logs or high latency.
 
 Key Kafka Concepts:
 
@@ -45,4 +52,5 @@ Timeline:
         Implement the Alerting Service (if you choose to do so).
         Test the entire flow and handle edge cases (e.g., Kafka downtimes, log spikes).
 
-This project should give you a solid hands-on experience with Kafka in a short amount of time, and it's scalable if you want to extend it in the future.
+This project should give you a solid hands-on experience with Kafka in a short amount of time, and it's scalable 
+if you want to extend it in the future.
