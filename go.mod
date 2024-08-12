@@ -4,6 +4,7 @@ go 1.22
 
 require (
 	github.com/IBM/sarama v1.43.2
+	github.com/fsnotify/fsnotify v1.7.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
@@ -28,4 +29,5 @@ require (
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 )
