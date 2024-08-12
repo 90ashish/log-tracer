@@ -23,7 +23,7 @@ func NewKafkaProducer(config *config.ProducerConfig) (*KafkaProducer, error) {
 	saramaConfig.Producer.Retry.Max = config.KafkaProducerConfig.Retries
 	saramaConfig.Producer.Return.Successes = true
 	saramaConfig.Producer.Compression = sarama.CompressionGZIP
-	saramaConfig.Producer.Partitioner = NewCustomPartitioner
+	saramaConfig.Producer.Partitioner = NewCustomPartitioner // custom partitioner
 
 	// Create a new SyncProducer instance
 	log.Println("Connecting to Kafka brokers:", config.KafkaProducerConfig.Brokers)
