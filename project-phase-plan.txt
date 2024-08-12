@@ -23,24 +23,35 @@ Phase 1: Data Collection (Producers)
         Ensure that the logging mechanism can easily add or remove contextual fields by making the serializer 
         function flexible.
 
-2. Support for Multiple Log Sources
+    2. Support for Multiple Log Sources
 
-    Dynamic Configuration of Log Sources:
-        Modify the config.yaml file to support multiple log sources. This can be done by allowing the sources 
-        key to accept a list of services or log sources.
-        For each log source, specify details such as the source name, severity level, and any other relevant information.
+        Dynamic Configuration of Log Sources:
+            Modify the config.yaml file to support multiple log sources. This can be done by allowing the sources 
+            key to accept a list of services or log sources.
+            For each log source, specify details such as the source name, severity level, and any other relevant information.
 
-    Implementation of Dynamic Log Source Handling:
-        Update the config.go file to parse the new configuration structure that includes multiple sources.
-        Modify the kafka_producer.go and handler.go files to dynamically handle logs from different sources.
-        Implement a mechanism to reload the configuration at runtime without requiring a restart, allowing 
-        the addition or removal of log sources dynamically.
+        Implementation of Dynamic Log Source Handling:
+            Update the config.go file to parse the new configuration structure that includes multiple sources.
+            Modify the kafka_producer.go and handler.go files to dynamically handle logs from different sources.
+            Implement a mechanism to reload the configuration at runtime without requiring a restart, allowing 
+            the addition or removal of log sources dynamically.
 
-    Implementation Steps:
-        Update the config.go file to handle an array of log sources.
-        Adjust the log sending logic in handler.go to loop through all configured log sources and send logs accordingly.
-        Implement a configuration reloader that watches the config.yaml file for changes and updates the 
-        running configuration dynamically.
+        Implementation Steps:
+            Update the config.go file to handle an array of log sources.
+            Adjust the log sending logic in handler.go to loop through all configured log sources and send logs accordingly.
+            Implement a configuration reloader that watches the config.yaml file for changes and updates the 
+            running configuration dynamically.
+            
+    3. Implementing Secure Log Transmission
+
+        Add SSL/TLS support to ensure secure transmission of log data to Kafka:
+            SSL/TLS configuration for secure transmission has not been addressed yet. 
+            This would typically involve updating the Kafka producer configuration to include SSL settings and certificates.
+
+        Implement authentication and authorization mechanisms for producers:
+            Authentication and authorization mechanisms, such as SASL (Simple Authentication and Security Layer), 
+            have not been implemented. This would require additional configuration in both the Kafka broker and the 
+            producer settings.
 
 Phase 2: Data Processing (Consumers)
 
