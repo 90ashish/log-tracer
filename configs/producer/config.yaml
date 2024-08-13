@@ -6,12 +6,13 @@ kafka_producer:
   retries: 3
   batch_size: 16384
   linger_ms: 1
-  compression_type: "gzip"
+  compression_type: "none"  # Disable compression for testing
   ssl:
     enabled: true
     ca_cert: "/etc/kafka/secrets/ca-cert.pem"
-    client_cert: "/etc/kafka/secrets/kafka-server-cert.pem"
-    client_key: "/etc/kafka/secrets/kafka-server-key.pem"
+    client_cert: "/etc/kafka/secrets/new-client-cert.pem"
+    client_key: "/etc/kafka/secrets/new-client-key.pem"
+    insecure_skip_verify: true
     sources:
       - name: "serviceA"
         environment: "production"

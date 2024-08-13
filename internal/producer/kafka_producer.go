@@ -49,8 +49,11 @@ func NewKafkaProducer(cfg *config.ProducerConfig) (*KafkaProducer, error) {
 	}, nil
 }
 
+// createTLSConfiguration creates a TLS configuration based on the provided SSL configuration
 func createTLSConfiguration(sslConfig config.SSLConfig) (*tls.Config, error) {
-	tlsConfig := &tls.Config{}
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: sslConfig.InsecureSkipVerify,
+	}
 
 	if sslConfig.CACert != "" {
 		caCert, err := os.ReadFile(sslConfig.CACert)

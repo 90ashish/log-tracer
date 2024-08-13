@@ -55,6 +55,8 @@ services:
     volumes:
       - ./configs/producer:/root/configs/producer
       - ./secrets:/etc/kafka/secrets
+    # command: tail -f /dev/null
+
 
   consumer:
     build:

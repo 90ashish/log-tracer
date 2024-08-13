@@ -16,10 +16,11 @@ type LogSourceConfig struct {
 }
 
 type SSLConfig struct {
-	Enabled    bool   `yaml:"enabled"`
-	CACert     string `yaml:"ca_cert"`
-	ClientCert string `yaml:"client_cert"`
-	ClientKey  string `yaml:"client_key"`
+	Enabled            bool   `yaml:"enabled"`
+	CACert             string `yaml:"ca_cert"`
+	ClientCert         string `yaml:"client_cert"`
+	ClientKey          string `yaml:"client_key"`
+	InsecureSkipVerify bool   `yaml:"insecure_skip_verify"`
 }
 
 // KafkaProducerConfig holds the Kafka configuration parameters for the producer
