@@ -42,7 +42,7 @@ Phase 1: Data Collection (Producers)
             Implement a configuration reloader that watches the config.yaml file for changes and updates the 
             running configuration dynamically.
             
-    3. Implementing Secure Log Transmission
+    3. Implementing Secure Log Transmission : ## TODO ##
 
         Add SSL/TLS support to ensure secure transmission of log data to Kafka:
             SSL/TLS configuration for secure transmission has not been addressed yet. 
@@ -55,17 +55,90 @@ Phase 1: Data Collection (Producers)
 
 Phase 2: Data Processing (Consumers)
 
-    Log Filtering and Enrichment:
-        Implement filtering logic to discard unnecessary logs based on severity level or other criteria.
-        Add enrichment capabilities, such as adding metadata (e.g., geolocation, user information) to logs.
+    1. Log Filtering and Enrichment
 
-    Error Handling and Retry Mechanisms:
-        Enhance the consumer with robust error handling, including retry mechanisms for transient errors.
-        Log and monitor failed log messages for debugging purposes.
+        Log Filtering:
 
-    Scalability and Load Balancing:
-        Implement support for multiple consumer instances to balance the load and ensure high availability.
-        Use Kafka consumer groups to automatically distribute the workload among consumers.
+            Purpose: Discard unnecessary logs based on severity level or other criteria to reduce noise and save 
+            storage/processing resources.
+            Implementation Steps:
+                Define Filtering Criteria:
+                    Update your config.yaml to specify filtering rules. For example, include minimum severity levels 
+                    that a log message must meet to be processed.
+                    You can extend the configuration to allow filtering based on other criteria, such as log source, 
+                    environment, or custom fields.
+                Implement Filtering Logic:
+                    Modify the handler.go file in the consumer directory to incorporate filtering logic.
+                    Before processing a log message, check if it meets the filtering criteria defined in the configuration.
+                    Discard or ignore logs that do not meet the criteria.
+
+        Log Enrichment:
+
+            Purpose: Add additional metadata to logs, such as geolocation, user information, or application context, 
+            to provide more context for analysis.
+            Implementation Steps:
+                Define Enrichment Metadata:
+                    Extend your configuration to include enrichment rules. For example, define which metadata should be 
+                    added to logs.
+                    You can fetch enrichment data from external sources (e.g., a database for user information).
+                Implement Enrichment Logic:
+                    Modify the handler.go file to add enrichment logic.
+                    For each log message, attach the required metadata based on the enrichment rules.
+                    Ensure that the enrichment process is efficient to avoid adding significant latency to log processing.
+
+    2. Error Handling and Retry Mechanisms
+
+        Error Handling:
+
+            Purpose: Enhance the consumer’s robustness by properly handling errors and ensuring that failed messages are 
+            logged and monitored.
+            Implementation Steps:
+                Categorize Errors:
+                    Identify common errors that can occur during log processing (e.g., network issues, message deserialization 
+                    failures).
+                    Categorize errors as transient (temporary) or fatal (requires intervention).
+                Implement Error Handling Logic:
+                    Modify handler.go to include error handling mechanisms.
+                    For transient errors, implement retry logic with exponential backoff to handle temporary issues.
+                    For fatal errors, log the error details and move on to the next message.
+                    Ensure that errors are logged for monitoring and debugging purposes.
+
+        Retry Mechanisms:
+
+            Purpose: Ensure that transient errors are handled by retrying the processing of failed messages.
+            Implementation Steps:
+                Configure Retry Policies:
+                    Add retry configuration to config.yaml, specifying the maximum number of retries and backoff intervals.
+                Implement Retry Logic:
+                    Update handler.go to retry processing of failed messages based on the configured retry policy.
+                    Use a backoff strategy to avoid overwhelming the system with immediate retries.
+
+    3. Scalability and Load Balancing
+
+        Scalability:
+
+            Purpose: Ensure that the system can handle increasing volumes of log data by scaling the number of consumer instances.
+            Implementation Steps:
+                Use Kafka Consumer Groups:
+                    Modify your consumer configuration to use Kafka consumer groups. This allows multiple consumer 
+                    instances to share the load of processing messages from the same topic.
+                Scale Consumer Instances:
+                    In your docker-compose.yaml, allow the consumer service to be scaled. For example, 
+                    docker-compose up --scale consumer=3 would start three instances of the consumer service.
+                    Ensure that each consumer instance is part of the same consumer group to distribute the workload evenly.
+
+        Load Balancing:
+
+            Purpose: Distribute the log processing load evenly among multiple consumer instances to improve performance 
+            and reliability.
+            Implementation Steps:
+                Consumer Group Management:
+                    Kafka automatically handles load balancing within a consumer group. Ensure that your consumer 
+                    instances are correctly configured to be part of the same group.
+                Monitor and Adjust:
+                    Monitor the performance and load distribution among consumer instances. Use Kafka metrics to assess 
+                    if the load is balanced.
+                    Adjust the number of consumer instances as needed to maintain optimal performance.
 
 Phase 3: Data Storage and Archiving
 
