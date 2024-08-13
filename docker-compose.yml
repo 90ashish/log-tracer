@@ -14,14 +14,22 @@ services:
     container_name: kafka
     ports:
       - "9092:9092"
+      - "9093:9093"
     environment:
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,SSL://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,SSL://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,SSL:SSL
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka-server.keystore.jks
+      KAFKA_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_SSL_KEY_PASSWORD: password
+      KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka-server.truststore.jks
+      KAFKA_SSL_TRUSTSTORE_PASSWORD: password
+      KAFKA_SSL_CLIENT_AUTH: required
       KAFKA_LOG_RETENTION_HOURS: 168
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./secrets:/etc/kafka/secrets
     depends_on:
       - zookeeper
     networks:
@@ -38,14 +46,15 @@ services:
       dockerfile: build/Dockerfile-producer
     container_name: log-producer
     environment:
-      KAFKA_BROKER: kafka:9092
+      KAFKA_BROKER: kafka:9093
     networks:
       - kafka-net
     depends_on:
       kafka:
         condition: service_healthy
     volumes:
-      - ./configs/producer:/root/configs/producer # Mount the config directory
+      - ./configs/producer:/root/configs/producer
+      - ./secrets:/etc/kafka/secrets
 
   consumer:
     build:
@@ -53,7 +62,7 @@ services:
       dockerfile: build/Dockerfile-consumer
     container_name: log-consumer
     environment:
-      KAFKA_BROKER: kafka:9092
+      KAFKA_BROKER: kafka:9093
       LOG_TOPIC: logs
     networks:
       - kafka-net
@@ -61,7 +70,8 @@ services:
       kafka:
          condition: service_healthy
     volumes:
-      - ./configs/consumer:/root/configs/consumer # Mount the config directory
+      - ./configs/consumer:/root/configs/consumer
+      - ./secrets:/etc/kafka/secrets
 
   dashboard:
     build:

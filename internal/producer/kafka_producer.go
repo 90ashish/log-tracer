@@ -2,9 +2,11 @@ package producer
 
 import (
 	"context"
-	"log"
+	"crypto/tls"
+	"crypto/x509"
 	"log-tracer/internal/config"
 	"log-tracer/internal/pkg/logger"
+	"os"
 
 	"github.com/IBM/sarama"
 )
@@ -16,18 +18,26 @@ type KafkaProducer struct {
 }
 
 // NewKafkaProducer initializes a new KafkaProducer with the provided configuration
-func NewKafkaProducer(config *config.ProducerConfig) (*KafkaProducer, error) {
+func NewKafkaProducer(cfg *config.ProducerConfig) (*KafkaProducer, error) {
 	saramaConfig := sarama.NewConfig()
-	// Set Kafka producer configurations
-	saramaConfig.Producer.RequiredAcks = sarama.RequiredAcks(config.KafkaProducerConfig.Acks)
-	saramaConfig.Producer.Retry.Max = config.KafkaProducerConfig.Retries
+	saramaConfig.Producer.RequiredAcks = sarama.RequiredAcks(cfg.KafkaProducerConfig.Acks)
+	saramaConfig.Producer.Retry.Max = cfg.KafkaProducerConfig.Retries
 	saramaConfig.Producer.Return.Successes = true
 	saramaConfig.Producer.Compression = sarama.CompressionGZIP
-	saramaConfig.Producer.Partitioner = NewCustomPartitioner // custom partitioner
+	saramaConfig.Producer.Partitioner = NewCustomPartitioner
 
-	// Create a new SyncProducer instance
-	log.Println("Connecting to Kafka brokers:", config.KafkaProducerConfig.Brokers)
-	producer, err := sarama.NewSyncProducer(config.KafkaProducerConfig.Brokers, saramaConfig)
+	// Setup SSL/TLS if enabled
+	if cfg.KafkaProducerConfig.SSL.Enabled {
+		tlsConfig, err := createTLSConfiguration(cfg.KafkaProducerConfig.SSL)
+		if err != nil {
+			logger.Error("Failed to create TLS configuration", err)
+			return nil, err
+		}
+		saramaConfig.Net.TLS.Enable = true
+		saramaConfig.Net.TLS.Config = tlsConfig
+	}
+
+	producer, err := sarama.NewSyncProducer(cfg.KafkaProducerConfig.Brokers, saramaConfig)
 	if err != nil {
 		logger.Error("Failed to create Kafka producer", err)
 		return nil, err
@@ -35,8 +45,32 @@ func NewKafkaProducer(config *config.ProducerConfig) (*KafkaProducer, error) {
 
 	return &KafkaProducer{
 		Producer: producer,
-		Config:   config,
+		Config:   cfg,
 	}, nil
+}
+
+func createTLSConfiguration(sslConfig config.SSLConfig) (*tls.Config, error) {
+	tlsConfig := &tls.Config{}
+
+	if sslConfig.CACert != "" {
+		caCert, err := os.ReadFile(sslConfig.CACert)
+		if err != nil {
+			return nil, err
+		}
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
+		tlsConfig.RootCAs = caCertPool
+	}
+
+	if sslConfig.ClientCert != "" && sslConfig.ClientKey != "" {
+		clientCert, err := tls.LoadX509KeyPair(sslConfig.ClientCert, sslConfig.ClientKey)
+		if err != nil {
+			return nil, err
+		}
+		tlsConfig.Certificates = []tls.Certificate{clientCert}
+	}
+
+	return tlsConfig, nil
 }
 
 // SendMessage sends a message to the specified Kafka topic

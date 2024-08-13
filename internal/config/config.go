@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -14,6 +15,13 @@ type LogSourceConfig struct {
 	SeverityLevel string `yaml:"severity_level"`
 }
 
+type SSLConfig struct {
+	Enabled    bool   `yaml:"enabled"`
+	CACert     string `yaml:"ca_cert"`
+	ClientCert string `yaml:"client_cert"`
+	ClientKey  string `yaml:"client_key"`
+}
+
 // KafkaProducerConfig holds the Kafka configuration parameters for the producer
 type KafkaProducerConfig struct {
 	Brokers         []string          `yaml:"brokers"`
@@ -24,6 +32,7 @@ type KafkaProducerConfig struct {
 	LingerMS        int               `yaml:"linger_ms"`
 	CompressionType string            `yaml:"compression_type"`
 	Sources         []LogSourceConfig `yaml:"sources"` // Added for multiple log sources
+	SSL             SSLConfig         `yaml:"ssl"`
 }
 
 // KafkaConsumerConfig holds the Kafka configuration parameters for the consumer
@@ -60,11 +69,15 @@ func LoadProducerConfig(configPath string) (*ProducerConfig, error) {
 		return nil, err
 	}
 
+	fmt.Println("Raw YAML data:", string(data))
+
 	var config ProducerConfig
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("Loaded config: %+v\n", config)
 
 	return &config, nil
 }

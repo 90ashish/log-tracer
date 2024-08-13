@@ -1,22 +1,27 @@
 kafka_producer:
   brokers:
-    - "kafka:9092"
+    - "kafka:9093"  # Use the SSL port for Kafka
   topic: "logs"
   acks: -1
   retries: 3
   batch_size: 16384
   linger_ms: 1
   compression_type: "gzip"
-  sources:
-    - name: "serviceA"
-      environment: "production"
-      severity_level: "INFO"
-    - name: "serviceB"
-      environment: "staging"
-      severity_level: "WARN"
-    - name: "serviceC"
-      environment: "development"
-      severity_level: "DEBUG"
-    - name: "serviceD"
-      environment: "production"
-      severity_level: "ERROR"
+  ssl:
+    enabled: true
+    ca_cert: "/etc/kafka/secrets/ca-cert.pem"
+    client_cert: "/etc/kafka/secrets/kafka-server-cert.pem"
+    client_key: "/etc/kafka/secrets/kafka-server-key.pem"
+    sources:
+      - name: "serviceA"
+        environment: "production"
+        severity_level: "INFO"
+      - name: "serviceB"
+        environment: "staging"
+        severity_level: "WARN"
+      - name: "serviceC"
+        environment: "development"
+        severity_level: "DEBUG"
+      - name: "serviceD"
+        environment: "production"
+        severity_level: "ERROR"

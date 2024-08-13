@@ -1,0 +1,146 @@
+Below is a step-by-step guide to creating SSL certificates for your Kafka setup, including the necessary commands.
+1. Generate a Certificate Authority (CA)
+
+bash
+
+openssl req -new -x509 -keyout ca-key.pem -out ca-cert.pem -days 365 -passout pass:password -subj "/C=IN/ST=MH/L=Pune/O=none/OU=none/CN=ashish"
+
+This command generates a CA private key (ca-key.pem) and a self-signed CA certificate (ca-cert.pem).
+2. Create a Keystore for the Kafka Broker
+a. Generate the Broker's Keystore
+
+bash
+
+keytool -genkey -alias kafka -keyalg RSA -keystore kafka-server.keystore.jks -storepass password -validity 365 -keysize 2048
+
+When prompted, enter the distinguished name information. Ensure that the keystore password and key password are the same for simplicity.
+b. Generate a Certificate Signing Request (CSR)
+
+bash
+
+keytool -certreq -alias kafka -keystore kafka-server.keystore.jks -file cert-file -storepass password
+
+This command generates a CSR (cert-file) from the keystore.
+c. Sign the CSR with the CA
+
+bash
+
+openssl x509 -req -CA ca-cert.pem -CAkey ca-key.pem -in cert-file -out cert-signed -days 365 -CAcreateserial -passin pass:password
+
+This signs the CSR using the CA certificate, producing the signed certificate (cert-signed).
+d. Import the CA Certificate into the Keystore
+
+bash
+
+keytool -import -alias CARoot -keystore kafka-server.keystore.jks -file ca-cert.pem -storepass password -noprompt
+
+This imports the CA certificate into the keystore.
+e. Import the Signed Certificate into the Keystore
+
+bash
+
+keytool -import -alias kafka -keystore kafka-server.keystore.jks -file cert-signed -storepass password -noprompt
+
+This imports the signed certificate into the broker's keystore.
+3. Create a Truststore for the Kafka Broker
+
+bash
+
+keytool -import -alias CARoot -keystore kafka-server.truststore.jks -file ca-cert.pem -storepass password -noprompt
+
+This command creates a truststore (kafka-server.truststore.jks) and imports the CA certificate.
+4. Create a Keystore and Truststore for the Kafka Client (Producer/Consumer)
+a. Generate the Client’s Keystore
+
+bash
+
+keytool -genkey -alias client -keyalg RSA -keystore client.keystore.jks -storepass password -validity 365 -keysize 2048
+
+b. Generate a CSR for the Client
+
+bash
+
+keytool -certreq -alias client -keystore client.keystore.jks -file client-cert-file -storepass password
+
+c. Sign the Client’s CSR with the CA
+
+bash
+
+openssl x509 -req -CA ca-cert.pem -CAkey ca-key.pem -in client-cert-file -out client-cert-signed -days 365 -CAcreateserial -passin pass:password
+
+d. Import the CA Certificate into the Client’s Keystore
+
+bash
+
+keytool -import -alias CARoot -keystore client.keystore.jks -file ca-cert.pem -storepass password -noprompt
+
+e. Import the Signed Certificate into the Client’s Keystore
+
+bash
+
+keytool -import -alias client -keystore client.keystore.jks -file client-cert-signed -storepass password -noprompt
+
+f. Create a Truststore for the Client
+
+bash
+
+keytool -import -alias CARoot -keystore client.truststore.jks -file ca-cert.pem -storepass password -noprompt
+
+5. Verify the SSL Configuration
+
+To verify that the SSL setup is working, you can use the following command inside the Kafka broker or client container:
+
+bash
+
+openssl s_client -connect kafka:9093 -CAfile /path/to/ca-cert.pem
+
+This checks if the SSL handshake is successful when connecting to the Kafka broker.
+Summary of Files Generated:
+
+    ca-cert.pem: The CA certificate.
+    ca-key.pem: The CA private key.
+    kafka-server.keystore.jks: The Kafka broker’s keystore.
+    kafka-server.truststore.jks: The Kafka broker’s truststore.
+    client.keystore.jks: The Kafka client’s (producer/consumer) keystore.
+    client.truststore.jks: The Kafka client’s (producer/consumer) truststore.
+
+These steps should help you set up SSL/TLS for Kafka brokers and clients. 
+Make sure to adjust file paths and passwords as needed for your environment.
+
+
+#######################
+
+Convert Truststore to JKS Format (if necessary)
+
+If you find that the truststore is in PKCS12 format and want to convert it to JKS:
+
+bash
+
+keytool -importkeystore -srckeystore client.truststore.jks -srcstoretype PKCS12 -destkeystore client.truststore.jks -deststoretype JKS -srcstorepass password -deststorepass password
+
+This command converts the truststore from PKCS12 to JKS, ensuring that you are using the correct format.
+Verify the Truststore Type
+
+To verify that the truststore is indeed in JKS format, you can run:
+
+bash
+
+keytool -list -v -keystore client.truststore.jks -storepass password
+
+In the output, you should see Keystore type: JKS.
+Summary of Truststore Creation
+
+The truststore creation command provided earlier ensures the truststore is of JKS type:
+
+bash
+
+keytool -import -alias CARoot -keystore client.truststore.jks -file ca-cert.pem -storepass password -noprompt
+
+
+####################
+
+To verify the SSL configuration inside your Kafka container using openssl:
+
+    docker exec -it kafka /bin/bash
+    apk add --no-cache openssl
+    openssl s_client -connect kafka:9093 -CAfile /etc/kafka/secrets/ca-cert.pem
