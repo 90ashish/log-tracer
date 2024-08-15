@@ -7,3 +7,10 @@ kafka_consumer:
   max_wait_time: 100
   min_bytes: 1
   max_bytes: 1048576
+
+  filtering:
+    min_severity: "INFO"  # Minimum severity level for logs to be processed (DEBUG, INFO, WARN, ERROR)
+    
+  enrichment:
+    add_timestamp: true  # Add a timestamp to each log
+    add_host_info: true  # Add host information

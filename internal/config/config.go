@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -12,6 +13,17 @@ type LogSourceConfig struct {
 	Name          string `yaml:"name"`
 	Environment   string `yaml:"environment"`
 	SeverityLevel string `yaml:"severity_level"`
+}
+
+// FilteringConfig defines the structure for log filtering configuration
+type FilteringConfig struct {
+	MinSeverity string `yaml:"min_severity"`
+}
+
+// EnrichmentConfig defines the structure for log enrichment configuration
+type EnrichmentConfig struct {
+	AddTimestamp bool `yaml:"add_timestamp"`
+	AddHostInfo  bool `yaml:"add_host_info"`
 }
 
 // KafkaProducerConfig holds the Kafka configuration parameters for the producer
@@ -28,13 +40,15 @@ type KafkaProducerConfig struct {
 
 // KafkaConsumerConfig holds the Kafka configuration parameters for the consumer
 type KafkaConsumerConfig struct {
-	Brokers         []string `yaml:"brokers"`
-	GroupID         string   `yaml:"group_id"`
-	Topic           string   `yaml:"topic"`
-	AutoOffsetReset string   `yaml:"auto_offset_reset"`
-	MaxWaitTime     int      `yaml:"max_wait_time"`
-	MinBytes        int      `yaml:"min_bytes"`
-	MaxBytes        int      `yaml:"max_bytes"`
+	Brokers         []string         `yaml:"brokers"`
+	GroupID         string           `yaml:"group_id"`
+	Topic           string           `yaml:"topic"`
+	AutoOffsetReset string           `yaml:"auto_offset_reset"`
+	MaxWaitTime     int              `yaml:"max_wait_time"`
+	MinBytes        int              `yaml:"min_bytes"`
+	MaxBytes        int              `yaml:"max_bytes"`
+	Filtering       FilteringConfig  `yaml:"filtering"`
+	Enrichment      EnrichmentConfig `yaml:"enrichment"`
 }
 
 // ProducerConfig is the main configuration structure holding producer configurations
@@ -66,6 +80,8 @@ func LoadProducerConfig(configPath string) (*ProducerConfig, error) {
 		return nil, err
 	}
 
+	fmt.Printf("Loaded producer config: %+v\n", config)
+
 	return &config, nil
 }
 
@@ -87,6 +103,8 @@ func LoadConsumerConfig(configPath string) (*ConsumerConfig, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Printf("Loaded consumer config: %+v\n", config)
 
 	return &config, nil
 }

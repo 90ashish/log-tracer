@@ -41,7 +41,7 @@ func NewKafkaConsumer(cfg *config.ConsumerConfig) (*KafkaConsumer, error) {
 
 // Consume starts consuming messages from the Kafka topic
 func (kc *KafkaConsumer) Consume(ctx context.Context) error {
-	handler := &MessageHandler{}
+	handler := NewMessageHandler(kc.Config)
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
