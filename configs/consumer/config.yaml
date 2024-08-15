@@ -14,3 +14,8 @@ kafka_consumer:
   enrichment:
     add_timestamp: true  # Add a timestamp to each log
     add_host_info: true  # Add host information
+
+  retry:
+    max_retries: 5            # Maximum number of retries for transient errors
+    initial_backoff_ms: 100   # Initial backoff time in milliseconds
+    max_backoff_ms: 2000      # Maximum backoff time in milliseconds

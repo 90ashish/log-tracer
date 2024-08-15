@@ -38,6 +38,13 @@ type KafkaProducerConfig struct {
 	Sources         []LogSourceConfig `yaml:"sources"` // Added for multiple log sources
 }
 
+// RetryConfig defines the structure for retry configuration
+type RetryConfig struct {
+	MaxRetries       int `yaml:"max_retries"`
+	InitialBackoffMS int `yaml:"initial_backoff_ms"`
+	MaxBackoffMS     int `yaml:"max_backoff_ms"`
+}
+
 // KafkaConsumerConfig holds the Kafka configuration parameters for the consumer
 type KafkaConsumerConfig struct {
 	Brokers         []string         `yaml:"brokers"`
@@ -49,6 +56,7 @@ type KafkaConsumerConfig struct {
 	MaxBytes        int              `yaml:"max_bytes"`
 	Filtering       FilteringConfig  `yaml:"filtering"`
 	Enrichment      EnrichmentConfig `yaml:"enrichment"`
+	Retry           RetryConfig      `yaml:"retry"`
 }
 
 // ProducerConfig is the main configuration structure holding producer configurations

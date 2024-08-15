@@ -2,9 +2,11 @@ package consumer
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"log-tracer/internal/config"
 	"log-tracer/internal/pkg/logger"
+	"math/rand"
 	"os"
 	"time"
 
@@ -45,13 +47,67 @@ func (h *MessageHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim
 			continue // Skip the message if it doesn't meet the filtering criteria
 		}
 
-		logMessage = h.enrichLog(logMessage)
-
-		logger.Info("Processed log message", "logMessage", logMessage)
-
-		session.MarkMessage(message, "")
+		// Retry logic for processing the message
+		if err := h.processWithRetry(session, message); err != nil {
+			logger.Error("Failed to process message after retries", err)
+		}
 	}
 	return nil
+}
+
+// processWithRetry processes a message with retry logic
+func (h *MessageHandler) processWithRetry(session sarama.ConsumerGroupSession, message *sarama.ConsumerMessage) error {
+	var err error
+	for attempt := 0; attempt < h.config.KafkaConsumer.Retry.MaxRetries; attempt++ {
+		if attempt > 0 {
+			// Apply exponential backoff
+			backoff := h.calculateBackoff(attempt)
+			logger.Warn("Retrying message processing", "attempt", attempt, "backoff", backoff)
+			time.Sleep(backoff)
+		}
+
+		// Attempt to process the message
+		if err = h.processMessage(session, message); err == nil {
+			// Success: Mark the message as processed
+			session.MarkMessage(message, "")
+			return nil
+		}
+
+		// Check if the error is transient; if not, break the loop
+		if !h.isTransientError(err) {
+			logger.Error("Fatal error occurred, will not retry", err)
+			break
+		}
+	}
+
+	return err
+}
+
+// processMessage processes the log message and enriches it
+func (h *MessageHandler) processMessage(session sarama.ConsumerGroupSession, message *sarama.ConsumerMessage) error {
+	logMessage := string(message.Value)
+	logMessage = h.enrichLog(logMessage)
+	logger.Info("Processed log message", "logMessage", logMessage)
+	return nil // Replace with actual processing logic and error return if needed
+}
+
+// calculateBackoff calculates the backoff duration for retries
+func (h *MessageHandler) calculateBackoff(attempt int) time.Duration {
+	initialBackoff := time.Duration(h.config.KafkaConsumer.Retry.InitialBackoffMS) * time.Millisecond
+	maxBackoff := time.Duration(h.config.KafkaConsumer.Retry.MaxBackoffMS) * time.Millisecond
+	backoff := initialBackoff * time.Duration(1<<attempt)
+	if backoff > maxBackoff {
+		backoff = maxBackoff
+	}
+	// Add jitter to avoid thundering herd problem
+	jitter := time.Duration(rand.Int63n(int64(initialBackoff)))
+	return backoff + jitter
+}
+
+// isTransientError checks if the error is transient and can be retried
+func (h *MessageHandler) isTransientError(err error) bool {
+	// Example logic: return true for network-related errors, false for others
+	return errors.Is(err, sarama.ErrOutOfBrokers) || errors.Is(err, sarama.ErrRequestTimedOut)
 }
 
 // shouldProcessLog checks if the log should be processed based on severity
