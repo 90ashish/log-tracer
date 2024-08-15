@@ -8,7 +8,8 @@ log-tracer/
 │       └── main.go
 ├── internal/
 │   ├── config/
-│   │   └── config.go
+│   │   ├── producer_config.go   # file for producer config
+│   │   ├── consumer_config.go   # file for consumer config
 │   ├── producer/
 │   │   ├── handler.go
 │   │   ├── kafka_producer.go
