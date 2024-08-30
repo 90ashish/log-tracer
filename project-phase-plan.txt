@@ -42,7 +42,7 @@ Phase 1: Data Collection (Producers)
             Implement a configuration reloader that watches the config.yaml file for changes and updates the 
             running configuration dynamically.
             
-    3. Implementing Secure Log Transmission : ## TODO ##
+    3. Implementing Secure Log Transmission : ## TODO : Not Implemented ##
 
         Add SSL/TLS support to ensure secure transmission of log data to Kafka:
             SSL/TLS configuration for secure transmission has not been addressed yet. 

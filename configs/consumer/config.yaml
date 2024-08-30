@@ -1,7 +1,7 @@
 kafka_consumer:
   brokers:
     - "kafka:9092"
-  group_id: "log-consumers"
+  group_id: "log-consumers" # All consumers with this group_id will share the load
   topic: "logs"
   auto_offset_reset: "earliest"
   max_wait_time: 100

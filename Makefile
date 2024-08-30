@@ -2,13 +2,14 @@
 DOCKER_COMPOSE=docker-compose
 GO_CMD=go
 PROJECT_NAME=log-tracer
+CONSUMER_SCALE=3  # Number of consumer instances
 
 # Docker Commands
-.PHONY: start stop restart build clean logs shell
+.PHONY: start stop restart build clean logs shell scale-consumer
 
 start:
 	@echo "Starting the ${PROJECT_NAME} services..."
-	${DOCKER_COMPOSE} up -d
+	${DOCKER_COMPOSE} up -d --scale consumer=${CONSUMER_SCALE}
 
 stop:
 	@echo "Stopping the ${PROJECT_NAME} services..."
@@ -32,6 +33,10 @@ logs:
 shell:
 	@echo "Opening a shell in the Kafka container..."
 	${DOCKER_COMPOSE} exec kafka /bin/bash
+
+scale-consumer:
+	@echo "Scaling consumer services..."
+	${DOCKER_COMPOSE} up -d --scale consumer=${CONSUMER_SCALE}
 
 # Go Commands
 .PHONY: fmt vet test mod
@@ -81,4 +86,3 @@ dashboard:
 
 all: kafka-producer kafka-consumer dashboard
 	@echo "All components built successfully."
-

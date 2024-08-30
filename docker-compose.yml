@@ -51,7 +51,6 @@ services:
     build:
       context: .
       dockerfile: build/Dockerfile-consumer
-    container_name: log-consumer
     environment:
       KAFKA_BROKER: kafka:9092
       LOG_TOPIC: logs
